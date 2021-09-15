@@ -1,0 +1,95 @@
+<template>
+  <div class="wrapper">
+    <Search placeholder="寻找收藏的插画吧..." />
+    <div class="collection">
+      <div class="collection__title">我的收藏</div>
+      <div class="collection__content">
+        <div class="collection__show" v-if="IllustrationList.length === 0">
+          您暂未有收藏的插画！快去收藏吧！
+        </div>
+        <router-link
+          v-for="item in IllustrationList"
+          :key="item._id"
+          :to="`/illustration/${item._id}`"
+        >
+          <IllustrationList :item="item" />
+        </router-link>
+      </div>
+    </div>
+  </div>
+
+  <Docker :currentIndex="1" />
+</template>
+
+<script>
+import { ref } from "vue";
+import { get } from "../../utils/request";
+import Docker from "../../components/Docker.vue";
+import Search from "../../components/Search.vue";
+import IllustrationList from "../../components/IllustrationList.vue";
+
+const useRecommendEffect = () => {
+  const IllustrationList = ref([]);
+
+  const getRecommendList = async () => {
+    const res = await get("api/illustration/recommend");
+    if (res?.errno === 0 && res?.data?.length) {
+      IllustrationList.value = res.data;
+    }
+  };
+  return { IllustrationList, getRecommendList };
+};
+
+export default {
+  name: "Favorite",
+  components: { Docker, Search, IllustrationList },
+  setup() {
+    const { IllustrationList, getRecommendList } = useRecommendEffect();
+    getRecommendList();
+
+    return { IllustrationList };
+  },
+};
+</script>
+<style lang='scss' scoped>
+@import "../../style/mixins.scss";
+.wrapper {
+  position: absolute;
+  left: 0.2rem;
+  top: 0.2rem;
+  bottom: 0.8rem;
+  right: 0.2rem;
+
+  .collection {
+    margin-top: 0.2rem;
+    width: 100%;
+    &__title {
+      margin: 0 0 0.15rem 0.06rem;
+      color: #1f1d1d;
+      font-weight: bold;
+      font-size: 0.18rem;
+    }
+    &__content {
+      width: 100%;
+      height: 4.2rem;
+      overflow-y: scroll;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      @include hideScrollbar;
+      .illustration {
+        margin: 0 0 0.15rem 0;
+      }
+    }
+    &__show {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #818181;
+      font-weight: bold;
+      font-size: 0.15rem;
+    }
+  }
+}
+</style>

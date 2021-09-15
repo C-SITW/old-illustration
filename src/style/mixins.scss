@@ -1,0 +1,20 @@
+// 文本溢出隐藏
+@mixin ellipsis {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+// 隐藏滚动条
+@mixin hideScrollbar {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// 隐藏搜索框样式
+@mixin hideSearchStyle {
+  outline: none;
+  border: none;
+  background: none;
+}
