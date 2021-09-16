@@ -5,12 +5,10 @@
     </router-link>
     <div class="header__logo iconfont">&#xe60c;</div>
     <router-link :to="{ name: 'Personal' }">
-      <img class="header__user" src="../../assets/images/DefaultAvatar.jpeg" />
+      <img class="header__user" :src="userinfo.imgurl" />
     </router-link>
   </div>
-
   <Search placeholder="搜些逝去的图书插画吧..." />
-
   <div class="nav">
     <router-link v-for="item in navList" :key="item.title" :to="item.to">
       <div class="nav__item">
@@ -22,9 +20,8 @@
 </template>
 
 <script>
-import { reactive, toRefs } from "vue";
 import Search from "../../components/Search.vue";
-import { get } from "../../utils/request";
+import { useUserInfoEffect } from "../../utils/getUserInfo";
 
 export default {
   name: "Header",
@@ -53,16 +50,8 @@ export default {
       },
     ];
 
-    const data = {};
-
-    const getUserimg = async () => {
-      const res = await get("api/user/info");
-      data.value = res.data;
-    };
-
-    getUserimg();
-
-    return { navList, data };
+    const { userinfo } = useUserInfoEffect();
+    return { navList, userinfo };
   },
 };
 </script>
@@ -70,14 +59,12 @@ export default {
 <style lang='scss' scoped>
 @import "../../style/viriables.scss";
 @import "../../style/mixins.scss";
-
 .header {
   width: 100%;
   height: 0.5rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   &__detail,
   &__user {
     width: 0.5rem;
@@ -87,7 +74,6 @@ export default {
     background: $content-fontcolor;
     color: #fff;
   }
-
   &__user {
     &__img {
       width: 100%;
@@ -100,7 +86,6 @@ export default {
     color: $content-fontcolor;
   }
 }
-
 .nav {
   display: flex;
   margin-top: 0.2rem;

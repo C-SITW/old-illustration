@@ -31,56 +31,32 @@ import { get } from "../../utils/request";
 import Topnav from "../../components/Topnav.vue";
 import IllustrationList from "../../components/IllustrationList";
 
+const useArtistDetailEffect = () => {
+  const route = useRoute();
+  const id = route.params.id;
+  const data = reactive({
+    artistname: "",
+    artistinfo: "",
+    llustrationlist: [],
+  });
+  const getArtistDetails = async () => {
+    const res = await get(`api/artist/${id}`);
+    if (res?.errno === 0) {
+      data.artistname = res.data.artistname;
+      data.artistinfo = res.data.artistinfo;
+      data.llustrationlist = res.data.llustrationlist;
+    }
+  };
+  getArtistDetails();
+  const { artistname, artistinfo, llustrationlist } = toRefs(data);
+  return { artistname, artistinfo, llustrationlist };
+};
+
 export default {
   name: "Artist",
   components: { Topnav, IllustrationList },
-
   setup() {
-    const route = useRoute();
-    const id = route.params.id;
-
-    //   const data = reactive({ ArtistDetail: {} });
-
-    //   const getArtistDetails = async () => {
-    //     const res = await get(`api/artist/${id}`);
-    //     // console.log(res);
-    //     if (res?.errno === 0) {
-    //       data.ArtistDetail = res.data;
-    //     }
-    //   };
-
-    //   watchEffect(() => {
-    //     getArtistDetails();
-    //   });
-
-    //   const { ArtistDetail } = toRefs(data);
-    //   console.log(ArtistDetail);
-    //   const { artistname, artistinfo, llustrationlist } = toRefs(ArtistDetail);
-
-    //   return { artistname, artistinfo, llustrationlist };
-
-    // --------------------------------------
-
-    const data = reactive({
-      artistname: "",
-      artistinfo: "",
-      llustrationlist: [],
-    });
-
-    const getArtistDetails = async () => {
-      const res = await get(`api/artist/${id}`);
-      if (res?.errno === 0) {
-        data.artistname = res.data.artistname;
-        data.artistinfo = res.data.artistinfo;
-        data.llustrationlist = res.data.llustrationlist;
-      }
-    };
-
-    watchEffect(() => {
-      getArtistDetails();
-    });
-
-    const { artistname, artistinfo, llustrationlist } = toRefs(data);
+    const { artistname, artistinfo, llustrationlist } = useArtistDetailEffect();
     return { artistname, artistinfo, llustrationlist };
   },
 };

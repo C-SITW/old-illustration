@@ -1,11 +1,11 @@
 <template>
-  <Topnav title="每日推荐" />
+  <Topnav title="更多推荐" />
   <div class="wrapper">
     <div class="recommend">
       <div class="recommend__title">
-        <div class="recommend__title__day">31</div>
+        <div class="recommend__title__day">{{ dd }}</div>
         <div class="recommend__title__division"></div>
-        <div class="recommend__title__month">09</div>
+        <div class="recommend__title__month">{{ mm }}</div>
       </div>
       <div class="recommend__content">
         <div class="recommend__show" v-if="IllustrationList.length === 0">
@@ -23,32 +23,29 @@
   </div>
 </template>
 <script>
-import { ref } from "vue";
-import { get } from "../../utils/request";
+import { useIllustrationsEffect } from "../../utils/getIllustrations";
 import IllustrationList from "../../components/IllustrationList.vue";
 import Topnav from "../../components/Topnav";
 
-const useRecommendEffect = () => {
-  const IllustrationList = ref([]);
-
-  const getRecommendList = async () => {
-    const res = await get("api/illustration/recommend");
-    if (res?.errno === 0 && res?.data?.length) {
-      IllustrationList.value = res.data;
-    }
-  };
-
-  return { IllustrationList, getRecommendList };
+const getNowDate = () => {
+  let date = new Date();
+  let mm = date.getMonth() + 1;
+  let dd = date.getDate();
+  mm = mm.toString();
+  dd = dd.toString();
+  mm < 10 ? (mm = `0${mm}`) : mm;
+  dd < 10 ? (dd = `0${dd}`) : dd;
+  return { mm, dd };
 };
-
 export default {
   name: "More",
   components: { Topnav, IllustrationList },
   setup() {
-    const { IllustrationList, getRecommendList } = useRecommendEffect();
-    getRecommendList();
+    const url = "api/illustration/recommend";
+    const { IllustrationList } = useIllustrationsEffect(url);
+    const { mm, dd } = getNowDate();
 
-    return { IllustrationList };
+    return { IllustrationList, mm, dd };
   },
 };
 </script>

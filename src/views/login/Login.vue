@@ -27,9 +27,13 @@
     </div>
 
     <div class="login__button" @click="handleLogin">登录验证</div>
-    <router-link :to="{ name: 'Register' }">
-      <div class="login__link">注册</div>
-    </router-link>
+    <div class="register">
+      <router-link :to="{ name: 'Register' }">
+        <div class="login__link">注册</div>
+      </router-link>
+      <div class="login__split"></div>
+      <div class="login__demo">演示</div>
+    </div>
   </div>
 
   <router-link :to="{ name: 'Detail' }">
@@ -108,7 +112,6 @@ export default {
   left: 50%;
   transform: translateX(-50%);
 }
-
 .login {
   width: 3.36rem;
   height: 2.84rem;
@@ -151,16 +154,25 @@ export default {
     color: #fbf0f0;
     filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.25));
   }
-
-  &__link {
-    margin-top: 0.16rem;
+  &__link,
+  &__demo {
+    margin: 0.16rem 0.05rem;
     text-align: center;
     color: #575353;
     font-weight: bold;
     font-size: 0.16rem;
   }
+  &__split {
+    width: 0.02rem;
+    height: 0.18rem;
+    background: rgb(197, 197, 197);
+  }
 }
-
+.register {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .logo {
   position: absolute;
   left: 50%;

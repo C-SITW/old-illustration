@@ -1,39 +1,5 @@
 <template>
-  <header>
-    <div class="topnav-contont">
-      <div class="topnav">
-        <img
-          @click="handleBackClick"
-          src="../../assets/images/back.svg"
-          class="topnav__back"
-        />
-        <div
-          @click="handlecollectClick"
-          :class="{
-            topnav__collect: true,
-            iconfont: true,
-            'topnav__collect--active': collection ? true : false,
-          }"
-        >
-          &#xe603;
-        </div>
-      </div>
-    </div>
-
-    <img
-      src="https://www.oldbookillustrations.com/wp-content/uploads/2020/10/water-cart.jpg"
-      alt=""
-      class="bg"
-    />
-    <div class="details">
-      <div class="details__info">
-        <div class="details__info__name">Water Cart</div>
-        <div class="details__info__artistname">{{ artistname }}</div>
-        <div class="details__info__book">{{ book }}</div>
-      </div>
-      <img class="download" src="../../assets/images/download.svg" />
-    </div>
-  </header>
+  <IllustrationHeader :Illustrationinfo="datas" />
 
   <div class="wrapper">
     <div class="introduce">
@@ -45,13 +11,13 @@
       </div>
     </div>
     <div class="title">
-      {{ cn }}
+      {{ datas.cn }}
     </div>
     <div class="comment-content">
       <div class="commentbox">
-        <img src="../../assets/images/DefaultAvatar.jpeg" class="userimg" />
+        <img :src="userinfo.imgurl" class="userimg" />
         <div class="userinfo">
-          <div class="username">SITWZeze</div>
+          <div class="username">{{ userinfo.username }}</div>
           <div class="userinput">
             <input
               v-model="inputdata"
@@ -73,18 +39,33 @@
       <div class="commentare">
         <div class="commentare__content">
           <div class="commentare__content__title">评论</div>
-          <div class="commentare__content__count">02</div>
+          <div class="commentare__content__count">
+            {{
+              datas.comments.length > 10
+                ? datas.comments.length
+                : `0${datas.comments.length}`
+            }}
+          </div>
         </div>
 
+        <div class="commentare__show" v-if="datas.comments.length === 0">
+          暂无评论！快来抢沙发吧！！！
+        </div>
         <div
           class="commentare__item"
-          v-for="item in comments"
+          v-for="item in datas.comments"
           :key="item.commentid"
         >
           <img :src="item.userimgurl" class="commentare__userimg" />
           <div class="usercommentbox">
             <div class="usercomment__info">
-              <div class="usercomment__info__name">{{ item.username }}</div>
+              <div class="usercomment__info__name">
+                {{
+                  item.username === userinfo.username
+                    ? `${item.username}(我）`
+                    : item.username
+                }}
+              </div>
               <div class="usercomment__info__praise">
                 <div
                   :class="{
@@ -113,22 +94,16 @@ import { useRoute } from "vue-router";
 import { useRouter } from "vue-router";
 import { reactive, toRefs, ref } from "vue";
 import { get } from "../../utils/request";
+import IllustrationHeader from "./IllustrationHeader.vue";
+import { useUserInfoEffect } from "../../utils/getUserInfo.js";
 
 export default {
-  name: "",
+  name: "Illustration",
+  components: { IllustrationHeader },
   setup() {
     const router = useRouter();
     const route = useRoute();
     const id = route.params.id;
-
-    // const getIllustrationDetails = async () => {
-    //   const res = await get(`api/illustration/${id}`);
-    //   console.log(res);
-    // };
-
-    // getIllustrationDetails();
-
-    const inputdata = ref("");
 
     const data = reactive({
       _id: "61270f5ef91206387c457189",
@@ -176,17 +151,23 @@ export default {
       ],
     });
 
-    // 点击返回
-    const handleBackClick = () => {
-      router.back();
+    const datatest = reactive({ datas: {} });
+
+    // 获取后台数据
+    const getIllustrationDetails = async () => {
+      const res = await get(`api/illustration/${id}`);
+      datatest.datas = res.data;
     };
 
+    getIllustrationDetails();
+    const { datas } = toRefs(datatest);
+    // console.log(datas);
+
+    const inputdata = ref("");
     const { cn, collection, artistname, name, book, comments } = toRefs(data);
 
-    // 点击收藏
-    const handlecollectClick = () => {
-      data.collection = !data.collection;
-    };
+    // 获取用户信息
+    const { userinfo } = useUserInfoEffect();
 
     // 点击发表
     const handleReleaseClick = () => {
@@ -194,7 +175,12 @@ export default {
       inputdata.value = "";
     };
 
+    const Illustrationinfo = { collection, artistname, book, name };
+
     return {
+      data,
+      datas,
+      userinfo,
       inputdata,
       cn,
       collection,
@@ -202,9 +188,8 @@ export default {
       name,
       book,
       comments,
-      handleBackClick,
-      handlecollectClick,
       handleReleaseClick,
+      Illustrationinfo,
     };
   },
 };
@@ -412,6 +397,14 @@ header {
         font-size: 0.14rem;
       }
     }
+    &__show {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      color: #818181;
+      font-weight: bold;
+      font-size: 0.15rem;
+    }
   }
 
   .commentare__item {
@@ -428,6 +421,7 @@ header {
       height: 0.38rem;
       border-radius: 0.5rem;
     }
+
     .usercommentbox {
       width: 100%;
       display: flex;

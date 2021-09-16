@@ -20,12 +20,6 @@ export default {
 
 <style lang='scss' scoped>
 @import "../../style/mixins.scss";
-
-#app {
-  font-family: PingFang;
-  box-sizing: border-box;
-}
-
 .wrapper {
   position: absolute;
   left: 0.2rem;

@@ -10,8 +10,12 @@ export default {
 
 
 <style lang="scss">
-a {
-  text-decoration: none;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+#app {
+  font-family: PingFang;
+  box-sizing: border-box;
+  a {
+    text-decoration: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  }
 }
 </style>

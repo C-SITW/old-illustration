@@ -16,22 +16,24 @@
 import { ref } from "vue";
 import Topnav from "../../components/Topnav.vue";
 import { get } from "../../utils/request";
+
+const useArtistListEffect = () => {
+  const ArtistList = ref([]);
+  const getArtistList = async () => {
+    const res = await get("api/artist");
+    if (res?.errno === 0 && res?.data?.length) {
+      ArtistList.value = res.data;
+    }
+  };
+  getArtistList();
+  return { ArtistList };
+};
+
 export default {
   name: "Artists",
   components: { Topnav },
   setup() {
-    const ArtistList = ref([]);
-
-    const getArtistList = async () => {
-      const res = await get("api/artist");
-      // console.log(res.data);
-      if (res?.errno === 0 && res?.data?.length) {
-        ArtistList.value = res.data;
-      }
-    };
-
-    getArtistList();
-
+    const { ArtistList } = useArtistListEffect();
     return { ArtistList };
   },
 };

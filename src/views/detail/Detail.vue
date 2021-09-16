@@ -24,7 +24,7 @@
       <div class="introduce-item__technology">
         <a href=""><img src="../../assets/images/logo/vue_logo.png" /></a>
         <div class="introduce-item__technology__stack">vue-cli3</div>
-        <div class="introduce-item__technology__stack">vuex</div>
+        <div class="introduce-item__technology__stack">Composition</div>
         <div class="introduce-item__technology__stack">Axios</div>
       </div>
     </div>

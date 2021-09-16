@@ -22,31 +22,17 @@
 </template>
 
 <script>
-import { ref } from "vue";
-import { get } from "../../utils/request";
 import Docker from "../../components/Docker.vue";
 import Search from "../../components/Search.vue";
 import IllustrationList from "../../components/IllustrationList.vue";
-
-const useRecommendEffect = () => {
-  const IllustrationList = ref([]);
-
-  const getRecommendList = async () => {
-    const res = await get("api/illustration/recommend");
-    if (res?.errno === 0 && res?.data?.length) {
-      IllustrationList.value = res.data;
-    }
-  };
-  return { IllustrationList, getRecommendList };
-};
+import { useIllustrationsEffect } from "../../utils/getIllustrations";
 
 export default {
   name: "Favorite",
   components: { Docker, Search, IllustrationList },
   setup() {
-    const { IllustrationList, getRecommendList } = useRecommendEffect();
-    getRecommendList();
-
+    const url = "/api/user/collection";
+    const { IllustrationList } = useIllustrationsEffect(url);
     return { IllustrationList };
   },
 };

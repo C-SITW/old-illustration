@@ -28,7 +28,7 @@
     </div>
     <ul class="userinfo-content">
       <li
-        v-for="item in userinfo"
+        v-for="item in userinfos"
         :key="item.title"
         class="userinfo-content__item"
       >
@@ -36,18 +36,17 @@
         <input
           class="userinfo-content__item__input"
           type="text"
-          :value="item.value"
+          v-model="item.model"
         />
-      </li>
-      <li class="userinfo-content__item">
-        <div class="userinfo-content__item__title">测试</div>
-        <input class="userinfo-content__item__input" type="date" />
       </li>
     </ul>
   </div>
 </template>
 <script>
 import { useRouter } from "vue-router";
+import { reactive, toRefs } from "vue";
+
+import { useUserInfoEffect } from "../../utils/getUserInfo";
 export default {
   name: "Edituserinfo",
   setup() {
@@ -55,18 +54,30 @@ export default {
     const handleBackClick = () => {
       router.back();
     };
+
+    // 用户数据
+    const data = reactive({
+      username: "zeze",
+      sex: "男",
+      age: "12",
+      introduction: "寻找历史的痕迹，一定会发现什么",
+    });
+
+    const { username, sex, age, introduction } = toRefs(data);
+
+    const userinfos = reactive([
+      { title: "用户名", model: username },
+      { title: "性别", model: sex },
+      { title: "年龄", model: age },
+      { title: "简介", model: introduction },
+    ]);
+
+    // 更改信息
     const handleEditClick = () => {
-      console.log("修改信息！");
+      console.log(data);
     };
 
-    const userinfo = [
-      { title: "用户名", value: "zeze" },
-      { title: "性别", value: "男" },
-      { title: "年龄", value: "19" },
-      { title: "简介", value: "寻找历史的痕迹，一定会发现什么" },
-    ];
-
-    return { userinfo, handleBackClick, handleEditClick };
+    return { data, username, userinfos, handleBackClick, handleEditClick };
   },
 };
 </script>

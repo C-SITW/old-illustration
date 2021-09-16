@@ -37,11 +37,9 @@
       <div class="register__link">登录</div>
     </router-link>
   </div>
-
   <router-link :to="{ name: 'Detail' }">
     <img class="logo" src="../../assets/images/logo.svg" />
   </router-link>
-
   <Tosat v-if="show" :massage="toastMessage" />
 </template>
 

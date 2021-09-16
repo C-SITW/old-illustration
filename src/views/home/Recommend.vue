@@ -6,7 +6,6 @@
         <div class="main__title__more">更多</div>
       </router-link>
     </div>
-
     <div class="content">
       <router-link
         v-for="item in IllustrationList"
@@ -19,29 +18,15 @@
   </div>
 </template>
 <script>
-import { ref } from "vue";
-import { get } from "../../utils/request";
 import IllustrationList from "../../components/IllustrationList.vue";
-
-const useRecommendEffect = () => {
-  const IllustrationList = ref([]);
-  const getRecommendList = async () => {
-    const res = await get("api/illustration/recommend");
-    // console.log(res);
-    if (res?.errno === 0 && res?.data?.length) {
-      IllustrationList.value = res.data;
-    }
-  };
-  return { IllustrationList, getRecommendList };
-};
+import { useIllustrationsEffect } from "../../utils/getIllustrations";
 
 export default {
   name: "Recommend",
   components: { IllustrationList },
   setup() {
-    const { IllustrationList, getRecommendList } = useRecommendEffect();
-    getRecommendList();
-
+    const url = "api/illustration/recommend";
+    const { IllustrationList } = useIllustrationsEffect(url);
     return { IllustrationList };
   },
 };
