@@ -17,18 +17,14 @@
   <div class="wrapper">
     <div class="avatar-content">
       <div class="imgcontent">
-        <img
-          class="userimg"
-          src="../../assets/images/DefaultAvatar.jpeg"
-          alt=""
-        />
-        <img class="mask" src="../../assets/images/change.svg" alt="" />
+        <img class="userimg" :src="data.imgurl" />
+        <img class="mask" src="../../assets/images/change.svg" />
       </div>
       <div>点击更换头像</div>
     </div>
     <ul class="userinfo-content">
       <li
-        v-for="item in userinfos"
+        v-for="item in userinfo"
         :key="item.title"
         class="userinfo-content__item"
       >
@@ -41,43 +37,79 @@
       </li>
     </ul>
   </div>
+  <Tosat v-if="show" :massage="toastMessage" />
 </template>
 <script>
-import { useRouter } from "vue-router";
 import { reactive, toRefs } from "vue";
+import { useBackClickEffect } from "../../utils/backClick";
+import { get, patch } from "../../utils/request";
+import Tosat, { useToastEffect } from "../../components/Toast.vue";
 
-import { useUserInfoEffect } from "../../utils/getUserInfo";
+const useUserInfoEffect = () => {
+  // 用户数据
+  const data = reactive({
+    username: "zeze",
+    sex: "男",
+    age: "12",
+    introduction: "寻找历史的痕迹，一定会发现什么",
+    imgurl: "",
+  });
+  const getUserInfo = async () => {
+    const res = await get("api/user/info");
+    if (res?.errno === 0) {
+      data.username = res.data.username;
+      data.sex = res.data.sex;
+      data.age = res.data.age;
+      data.introduction = res.data.introduction;
+      data.imgurl = res.data.imgurl;
+    }
+  };
+  getUserInfo();
+  const { username, sex, age, introduction } = toRefs(data);
+  const userinfo = reactive([
+    { title: "用户名", model: username },
+    { title: "性别", model: sex },
+    { title: "年龄", model: age },
+    { title: "简介", model: introduction },
+  ]);
+
+  return { data, userinfo };
+};
+const useEditInfoEffect = (data) => {
+  const { show, toastMessage, showToast } = useToastEffect();
+  // 更改信息
+  const handleEditClick = async () => {
+    const res = await patch("/api/user/info", {
+      username: data.username,
+      sex: data.sex,
+      age: data.age,
+      introduction: data.introduction,
+    });
+    if (res?.errno === 0) {
+      showToast("更新成功！");
+      location.reload();
+    }
+  };
+
+  return { show, toastMessage, handleEditClick };
+};
+
 export default {
   name: "Edituserinfo",
+  components: { Tosat },
   setup() {
-    const router = useRouter();
-    const handleBackClick = () => {
-      router.back();
+    const { data, userinfo } = useUserInfoEffect();
+    const { show, toastMessage, handleEditClick } = useEditInfoEffect(data);
+    const { handleBackClick } = useBackClickEffect();
+
+    return {
+      data,
+      show,
+      userinfo,
+      toastMessage,
+      handleEditClick,
+      handleBackClick,
     };
-
-    // 用户数据
-    const data = reactive({
-      username: "zeze",
-      sex: "男",
-      age: "12",
-      introduction: "寻找历史的痕迹，一定会发现什么",
-    });
-
-    const { username, sex, age, introduction } = toRefs(data);
-
-    const userinfos = reactive([
-      { title: "用户名", model: username },
-      { title: "性别", model: sex },
-      { title: "年龄", model: age },
-      { title: "简介", model: introduction },
-    ]);
-
-    // 更改信息
-    const handleEditClick = () => {
-      console.log(data);
-    };
-
-    return { data, username, userinfos, handleBackClick, handleEditClick };
   },
 };
 </script>

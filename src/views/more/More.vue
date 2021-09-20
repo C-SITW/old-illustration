@@ -41,7 +41,7 @@ export default {
   name: "More",
   components: { Topnav, IllustrationList },
   setup() {
-    const url = "api/illustration/recommend";
+    const url = "api/illustration";
     const { IllustrationList } = useIllustrationsEffect(url);
     const { mm, dd } = getNowDate();
 

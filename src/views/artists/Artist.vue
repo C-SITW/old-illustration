@@ -7,12 +7,10 @@
         {{ artistinfo }}
       </div>
       <div class="artistinfo__llustration">
-        <div
-          class="artistinfo__llustration__show"
+        <Showtitle
           v-if="llustrationlist.length === 0"
-        >
-          正在努力收录该作者插画！
-        </div>
+          title="正在努力收录该作者插画！"
+        />
         <router-link
           v-for="item in llustrationlist"
           :key="item._id"
@@ -30,6 +28,7 @@ import { useRoute } from "vue-router";
 import { get } from "../../utils/request";
 import Topnav from "../../components/Topnav.vue";
 import IllustrationList from "../../components/IllustrationList";
+import Showtitle from "../../components/Showtitle.vue";
 
 const useArtistDetailEffect = () => {
   const route = useRoute();
@@ -54,7 +53,7 @@ const useArtistDetailEffect = () => {
 
 export default {
   name: "Artist",
-  components: { Topnav, IllustrationList },
+  components: { Topnav, IllustrationList, Showtitle },
   setup() {
     const { artistname, artistinfo, llustrationlist } = useArtistDetailEffect();
     return { artistname, artistinfo, llustrationlist };
@@ -96,14 +95,6 @@ export default {
       flex-wrap: wrap;
       .illustration {
         margin: 0 0 0.15rem 0;
-      }
-      &__show {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        color: #818181;
-        font-weight: bold;
-        font-size: 0.15rem;
       }
     }
   }

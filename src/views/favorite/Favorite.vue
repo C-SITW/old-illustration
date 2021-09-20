@@ -4,9 +4,10 @@
     <div class="collection">
       <div class="collection__title">我的收藏</div>
       <div class="collection__content">
-        <div class="collection__show" v-if="IllustrationList.length === 0">
-          您暂未有收藏的插画！快去收藏吧！
-        </div>
+        <Showtitle
+          v-if="IllustrationList.length === 0"
+          title="您暂未有收藏的插画！快去收藏吧！"
+        />
         <router-link
           v-for="item in IllustrationList"
           :key="item._id"
@@ -26,10 +27,11 @@ import Docker from "../../components/Docker.vue";
 import Search from "../../components/Search.vue";
 import IllustrationList from "../../components/IllustrationList.vue";
 import { useIllustrationsEffect } from "../../utils/getIllustrations";
+import Showtitle from "../../components/Showtitle.vue";
 
 export default {
   name: "Favorite",
-  components: { Docker, Search, IllustrationList },
+  components: { Docker, Search, IllustrationList, Showtitle },
   setup() {
     const url = "/api/user/collection";
     const { IllustrationList } = useIllustrationsEffect(url);
@@ -67,15 +69,9 @@ export default {
         margin: 0 0 0.15rem 0;
       }
     }
-    &__show {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #818181;
-      font-weight: bold;
-      font-size: 0.15rem;
-    }
+  }
+  .show {
+    align-items: center;
   }
 }
 </style>

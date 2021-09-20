@@ -34,11 +34,12 @@ export const useToastEffect = () => {
   transform: translate(-50%, -50%);
   padding: 0 0.05rem 0 0.05rem;
   border-radius: 0.1rem;
-  background: rgba(187, 27, 27, 0.699);
+  background: rgb(34, 26, 26);
   font-weight: 500;
   text-align: center;
   font-size: 0.14rem;
   line-height: 0.3rem;
   color: #fff;
+  z-index: 999999;
 }
 </style>

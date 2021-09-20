@@ -1,4 +1,3 @@
-
 <template>
   <div class="topnav-contont">
     <div class="topnav">
@@ -12,20 +11,18 @@
   </div>
 </template>
 <script>
-import { useRouter } from "vue-router";
+import { useBackClickEffect } from "../utils/backClick";
 
 export default {
   name: "Topnav ",
   props: ["title"],
   setup() {
-    const router = useRouter();
-    const handleBackClick = () => {
-      router.back();
-    };
+    const { handleBackClick } = useBackClickEffect();
     return { handleBackClick };
   },
 };
 </script>
+
 <style lang='scss' scoped>
 .topnav-contont {
   position: fixed;

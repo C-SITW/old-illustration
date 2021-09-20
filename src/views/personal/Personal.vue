@@ -5,23 +5,11 @@
       <img class="modify" src="../../assets/images/edit.svg" />
     </router-link>
     <div class="user">
-      <img src="../../assets/images/DefaultAvatar.jpeg" alt="" />
+      <img :src="data2.imgurl" />
       <div class="userinfo">
-        <div class="useritem">
-          <span class="title">获赞</span>
-          <span class="count">10</span>
-        </div>
-        <div class="useritem">
-          <span class="title">获赞</span>
-          <span class="count">10</span>
-        </div>
-        <div class="useritem">
-          <span class="title">获赞</span>
-          <span class="count">10</span>
-        </div>
-        <div class="useritem">
-          <span class="title">获赞</span>
-          <span class="count">10</span>
+        <div class="useritem" v-for="item in data" :key="item.title">
+          <span class="title">{{ item.title }}</span>
+          <span class="count">{{ item.count }}</span>
         </div>
       </div>
     </div>
@@ -35,8 +23,8 @@
       />
       <div class="content">
         <div class="user-cont">
-          <div class="username">SITW</div>
-          <div class="usersignature">寻找历史的痕迹，一定会发现什么...</div>
+          <div class="username">{{ data2.username }}</div>
+          <div class="usersignature">{{ data2.introduction }}</div>
         </div>
         <img src="../../assets/images/back.svg" class="link" />
       </div>
@@ -52,17 +40,81 @@
   <Docker :currentIndex="3" />
 </template>
 <script>
+import { ref, reactive, toRefs } from "vue";
+import { useUserInfoEffect } from "../../utils/getUserInfo";
+import { get } from "../../utils/request";
 import Docker from "../../components/Docker.vue";
+
+const useSignOutEffect = () => {
+  const handleSignOutClick = () => {
+    localStorage.removeItem("isLogin");
+    location.reload();
+  };
+  return { handleSignOutClick };
+};
+
 export default {
   name: "Personal",
   components: { Docker },
   setup() {
-    const handleSignOutClick = () => {
-      localStorage.removeItem("isLogin");
-      location.reload();
+    const { handleSignOutClick } = useSignOutEffect();
+    const { userinfo } = useUserInfoEffect();
+
+    // const data1 = reactive({ userinfos: {} });
+    // const totallikes = ref("");
+    // const fans = ref("");
+    // const follow = ref("");
+    // const collections = reactive([]);
+
+    const data2 = reactive({
+      username: "",
+      totallikes: "",
+      fans: "",
+      follow: "",
+      collections: [],
+      imgurl: "",
+      introduction: "",
+    });
+
+    const getUserInfo = async () => {
+      const res = await get("api/user/info");
+      if (res?.errno === 0) {
+        data2.totallikes = res.data.Totallikes;
+        data2.fans = res.data.fans;
+        data2.follow = res.data.follow;
+        data2.collections.value = res.data.collections;
+        data2.imgurl = res.data.imgurl;
+        data2.introduction = res.data.introduction;
+        data2.username = res.data.username;
+      }
     };
 
-    return { handleSignOutClick };
+    const { totallikes, fans, follow, collections } = toRefs(data2);
+
+    // const getUserInfo = async () => {
+    //   const res = await get("api/user/info");
+    //   if (res?.errno === 0) {
+    //     console.log(res);
+    //     data1.userinfos = res.data;
+    //     totallikes.value = res.data.Totallikes;
+    //     follow.value = res.data.follow;
+    //     fans.value = res.data.fans;
+    //     collections.value = res.data.collections;
+    //   }
+    // };
+    // const { userinfos } = toRefs(data1);
+
+    getUserInfo();
+
+    const data = [
+      { title: "获赞", count: totallikes },
+      { title: "粉丝", count: fans },
+      { title: "关注", count: follow },
+      { title: "收藏", count: collections.length },
+    ];
+
+    // return { handleSignOutClick, userinfo, userinfos, data };
+    return { handleSignOutClick, data, data2 };
   },
 };
 </script>
