@@ -5,15 +5,11 @@
     <div class="new">
       <div class="new__subject">
         <div class="new__subject__title">未读消息</div>
-        <div class="new__subject__count">02</div>
+        <div class="new__subject__count">{{ data.length }}</div>
       </div>
 
       <div class="new__content">
-        <div
-          class="new__item"
-          v-for="item in messagedata"
-          :key="item.createdAt"
-        >
+        <div class="new__item" v-for="item in data" :key="item.createdAt">
           <div class="new__item__time">{{ item.createdAt }}</div>
           <div class="new__item__userimg">
             <img :src="item.created_userimg" />
@@ -35,8 +31,10 @@
   <Docker :currentIndex="2" />
 </template>
 <script>
+import { reactive, toRefs } from "vue";
 import Docker from "../../components/Docker.vue";
 import Search from "../../components/Search.vue";
+import { get } from "../../utils/request";
 export default {
   name: "Message",
   components: { Docker, Search },
@@ -71,7 +69,19 @@ export default {
       },
     ];
 
-    return { messagedata };
+    const test = reactive({ data: [] });
+
+    const getMessage = async () => {
+      const res = await get("/api/messages");
+      if (res?.errno === 0) {
+        test.data = res.data;
+      }
+    };
+
+    getMessage();
+    const { data } = toRefs(test);
+
+    return { messagedata, data };
   },
 };
 </script>

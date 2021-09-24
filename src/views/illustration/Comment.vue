@@ -55,7 +55,9 @@
             </div>
             <div
               class="usercomment__info__praise"
-              @click="() => handleLikeClick(item.commentid, item.userid)"
+              @click="
+                () => handleLikeClick(item.commentid, item.userid, userinfo._id)
+              "
             >
               <div
                 :class="{
@@ -77,7 +79,7 @@
         <div
           class="commentare__item__del iconfont"
           v-if="item.username === userinfo.username"
-          @click="handleDelClick"
+          @click="() => handleDelClick(item.commentid)"
         >
           &#xe612;
         </div>
@@ -89,7 +91,7 @@
 <script>
 import { ref, watchEffect } from "vue";
 import { useRoute } from "vue-router";
-import { post } from "../../utils/request";
+import { post, del } from "../../utils/request";
 import { useUserInfoEffect } from "../../utils/getUserInfo.js";
 import Tosat, { useToastEffect } from "../../components/Toast.vue";
 import Showtitle from "../../components/Showtitle.vue";
@@ -115,6 +117,24 @@ const useeReleaseEffect = (illustrationid, showToast) => {
   return { inputdata, handleReleaseClick };
 };
 
+// 点赞
+const useeLikeEffect = (id, showToast) => {
+  const handleLikeClick = async (commentid, involve_id, userid) => {
+    if (involve_id === userid) {
+      return showToast("不能点赞自己的评论！");
+    } else {
+      const res = await post("api/messages", {
+        illustrationid: id,
+        commentid,
+        involve_id,
+        type: 0,
+      });
+      location.reload();
+    }
+  };
+  return { handleLikeClick };
+};
+
 export default {
   name: "Comment",
   props: ["data"],
@@ -123,28 +143,25 @@ export default {
     const route = useRoute();
     const id = route.params.id;
 
+    // 删除功能
+    const handleDelClick = async (commentid) => {
+      const res = await del("/api/comment", {
+        illustrationid: id,
+        commentid,
+      });
+      console.log(res);
+    };
+
     // 获取用户信息
     const { userinfo } = useUserInfoEffect();
 
     const { show, toastMessage, showToast } = useToastEffect();
+
     // 点击发表
     const { inputdata, handleReleaseClick } = useeReleaseEffect(id, showToast);
 
     // 点赞功能
-    const handleLikeClick = async (commentid, involve_id) => {
-      const res = await post("api/messages", {
-        illustrationid: id,
-        commentid,
-        involve_id,
-        type: 0,
-      });
-      location.reload();
-    };
-
-    // 删除功能
-    const handleDelClick = () => {
-      console.log("删除了");
-    };
+    const { handleLikeClick } = useeLikeEffect(id, showToast);
 
     return {
       userinfo,

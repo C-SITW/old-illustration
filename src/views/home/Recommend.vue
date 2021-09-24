@@ -25,7 +25,7 @@ export default {
   name: "Recommend",
   components: { IllustrationList },
   setup() {
-    const url = "api/illustration/recommend";
+    const url = "api/illustration/recommend/5";
     const { IllustrationList } = useIllustrationsEffect(url);
     return { IllustrationList };
   },
