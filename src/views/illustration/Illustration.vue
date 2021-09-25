@@ -1,11 +1,10 @@
 <template>
-  <Header :data="datas" />
+  <Header :data="data" />
 
   <div class="wrapper">
-    <Details :data="datas" />
-    <Comment :data="datas" />
+    <Details :data="data" />
+    <Comment :data="data" />
   </div>
-  <Tosat v-if="show" :massage="toastMessage" />
 </template>
 <script>
 import { useRoute } from "vue-router";
@@ -14,25 +13,32 @@ import { get } from "../../utils/request";
 import Header from "./Header.vue";
 import Details from "./Details.vue";
 import Comment from "./Comment.vue";
-import Tosat, { useToastEffect } from "../../components/Toast.vue";
+
+// 获取该插画后台数据
+const useDetailsEffect = () => {
+  const route = useRoute();
+  const id = route.params.id;
+
+  // 获取该插画后台数据
+  const illustration = reactive({ data: {} });
+  const getDetails = async () => {
+    const res = await get(`api/illustration/${id}`);
+    illustration.data = res.data;
+  };
+
+  getDetails();
+  const { data } = toRefs(illustration);
+
+  return { data };
+};
 
 export default {
   name: "Illustration",
-  components: { Header, Tosat, Details, Comment },
+  components: { Header, Details, Comment },
+  // components: { Header, Details },
   setup() {
-    const route = useRoute();
-    const id = route.params.id;
-
-    // 获取该插画后台数据
-    const datatest = reactive({ datas: {} });
-    const getIllustrationDetails = async () => {
-      const res = await get(`api/illustration/${id}`);
-      datatest.datas = res.data;
-    };
-
-    getIllustrationDetails();
-    const { datas } = toRefs(datatest);
-    return { datas };
+    const { data } = useDetailsEffect();
+    return { data };
   },
 };
 </script>

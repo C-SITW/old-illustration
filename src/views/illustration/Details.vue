@@ -35,9 +35,7 @@ export default {
   name: "Details",
   props: ["data"],
   setup() {
-    // 处理中英切换
     const { landdata, currentland, handleSelectClick } = useLandEffect();
-
     return { landdata, currentland, handleSelectClick };
   },
 };
@@ -62,7 +60,6 @@ export default {
     }
   }
 }
-
 .title {
   margin-top: 0.2rem;
   font-weight: 500;

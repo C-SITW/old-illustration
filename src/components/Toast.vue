@@ -3,6 +3,7 @@
 </template>
 <script>
 import { reactive, toRefs } from "vue";
+
 export default {
   name: "Tosat",
   props: ["massage"],

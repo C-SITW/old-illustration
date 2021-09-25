@@ -27,9 +27,9 @@
         <div class="commentare__content__title">评论</div>
         <div class="commentare__content__count">
           {{
-            data.comments.length > 10
-              ? data.comments.length
-              : `0${data.comments.length}`
+            datas.comments.length > 10
+              ? datas.comments.length
+              : `0${datas.comments.length}`
           }}
         </div>
       </div>
@@ -40,7 +40,7 @@
 
       <div
         class="commentare__item"
-        v-for="item in data.comments"
+        v-for="(item, index) in datas.comments"
         :key="item.commentid"
       >
         <img :src="item.userimgurl" class="commentare__userimg" />
@@ -79,7 +79,7 @@
         <div
           class="commentare__item__del iconfont"
           v-if="item.username === userinfo.username"
-          @click="() => handleDelClick(item.commentid)"
+          @click="() => handleDelClick(item.commentid, index)"
         >
           &#xe612;
         </div>
@@ -89,7 +89,7 @@
   <Tosat v-if="show" :massage="toastMessage" />
 </template>
 <script>
-import { ref, watchEffect } from "vue";
+import { reactive, ref, watchEffect, toRefs } from "vue";
 import { useRoute } from "vue-router";
 import { post, del } from "../../utils/request";
 import { useUserInfoEffect } from "../../utils/getUserInfo.js";
@@ -100,17 +100,21 @@ import Showtitle from "../../components/Showtitle.vue";
 const useeReleaseEffect = (illustrationid, showToast) => {
   const inputdata = ref("");
   const handleReleaseClick = async () => {
-    const res = await post("/api/comment", {
-      illustrationid,
-      content: inputdata.value,
-    });
-    inputdata.value = "";
-    console.log(res);
-    if (res?.errno === 0) {
-      showToast("发表成功！");
-      location.reload();
+    if (inputdata.value === "") {
+      showToast("内容不能为空！");
     } else {
-      showToast("发表失败！请重试！");
+      const res = await post("/api/comment", {
+        illustrationid,
+        content: inputdata.value,
+      });
+      inputdata.value = "";
+      console.log(res);
+      if (res?.errno === 0) {
+        showToast("发表成功！");
+        location.reload();
+      } else {
+        showToast("发表失败！请重试！");
+      }
     }
   };
 
@@ -121,7 +125,7 @@ const useeReleaseEffect = (illustrationid, showToast) => {
 const useeLikeEffect = (id, showToast) => {
   const handleLikeClick = async (commentid, involve_id, userid) => {
     if (involve_id === userid) {
-      return showToast("不能点赞自己的评论！");
+      showToast("不能点赞自己的评论！");
     } else {
       const res = await post("api/messages", {
         illustrationid: id,
@@ -139,18 +143,9 @@ export default {
   name: "Comment",
   props: ["data"],
   components: { Tosat, Showtitle },
-  setup() {
+  setup(props) {
     const route = useRoute();
     const id = route.params.id;
-
-    // 删除功能
-    const handleDelClick = async (commentid) => {
-      const res = await del("/api/comment", {
-        illustrationid: id,
-        commentid,
-      });
-      console.log(res);
-    };
 
     // 获取用户信息
     const { userinfo } = useUserInfoEffect();
@@ -163,6 +158,23 @@ export default {
     // 点赞功能
     const { handleLikeClick } = useeLikeEffect(id, showToast);
 
+    // 获取组件的数据
+    const { data } = toRefs(props);
+    const datas = reactive({ comments: [] });
+    watchEffect(() => {
+      datas.comments = data.value.comments;
+    });
+
+    // 删除评论
+    const handleDelClick = async (commentid, index) => {
+      // const res = await del("/api/comment", {
+      //   illustrationid: id,
+      //   commentid,
+      // });
+      datas.comments.splice(index, 1);
+      showToast("精彩评论已被删除！");
+    };
+
     return {
       userinfo,
       inputdata,
@@ -171,6 +183,7 @@ export default {
       toastMessage,
       handleLikeClick,
       handleDelClick,
+      datas,
     };
   },
 };
@@ -181,7 +194,7 @@ export default {
 .main {
   margin-top: 0.2rem;
   // width: 100%;
-  height: 10rem;
+  // height: 10rem;
   .commentbox {
     display: flex;
     align-items: center;

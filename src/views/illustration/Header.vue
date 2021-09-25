@@ -12,7 +12,7 @@
           :class="{
             topnav__collect: true,
             iconfont: true,
-            'topnav__collect--active': data.collection ? true : false,
+            'topnav__collect--active': collection ? true : false,
           }"
         >
           &#xe603;
@@ -38,30 +38,46 @@ import { useRoute } from "vue-router";
 import { patch } from "../../utils/request";
 import { useBackClickEffect } from "../../utils/backClick";
 import Tosat, { useToastEffect } from "../../components/Toast.vue";
+import { ref, toRefs } from "@vue/reactivity";
+import { watchEffect } from "@vue/runtime-core";
 
-const useCollectEffect = () => {
-  const { show, toastMessage, showToast } = useToastEffect();
+// 收藏
+const useCollectEffect = (props) => {
   const route = useRoute();
   const illustrationid = route.params.id;
+  const { data } = toRefs(props);
+  const { show, toastMessage, showToast } = useToastEffect();
+  const collection = ref("");
+  watchEffect(() => {
+    collection.value = data.value.collection;
+  });
+
   // 点击收藏
   const handlecollectClick = async () => {
     const res = await patch("/api/user/collection", { illustrationid });
     const state = res.data.CollectionState;
     state ? showToast("收藏成功！") : showToast("已取消收藏！");
-    location.reload();
+    collection.value = !collection.value;
   };
-  return { show, toastMessage, handlecollectClick };
+  return { collection, show, toastMessage, handlecollectClick };
 };
 
 export default {
   name: "Header",
   props: ["data"],
   components: { Tosat },
-  setup() {
-    const { show, toastMessage, handlecollectClick } = useCollectEffect();
+  setup(props) {
     const { handleBackClick } = useBackClickEffect();
+    const { collection, show, toastMessage, handlecollectClick } =
+      useCollectEffect(props);
 
-    return { handleBackClick, handlecollectClick, show, toastMessage };
+    return {
+      handleBackClick,
+      handlecollectClick,
+      collection,
+      show,
+      toastMessage,
+    };
   },
 };
 </script>
